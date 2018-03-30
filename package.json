@@ -4,6 +4,7 @@
   "description": "Distributed scalable database",
   "main": "index.js",
   "dependencies": {
+    "aes-js": "^3.1.0",
     "bulk-write-stream": "^1.1.3",
     "codecs": "^1.2.1",
     "hypercore": "^6.12.6",
@@ -13,6 +14,7 @@
     "nanoiterator": "^1.0.0",
     "protocol-buffers-encodings": "^1.1.0",
     "random-access-file": "^2.0.1",
+    "randombytes": "^2.0.6",
     "sodium-universal": "^2.0.0",
     "thunky": "^1.0.2",
     "unordered-array-remove": "^1.0.2",
@@ -39,5 +41,11 @@
   "bugs": {
     "url": "https://github.com/mafintosh/hyperdb/issues"
   },
-  "homepage": "https://github.com/mafintosh/hyperdb#readme"
+  "homepage": "https://github.com/mafintosh/hyperdb#readme",
+  "standard": {
+    "ignore": [
+      "/node_modules/",
+      "/hypercore-encrypted/"
+    ]
+  }
 }

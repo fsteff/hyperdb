@@ -66,7 +66,7 @@ tape('remote watch', function (t) {
   var db = create.one()
 
   db.ready(function () {
-    var clone = create.one(db.key)
+    var clone = create.one(db.key, {cryptoBooks: db.cryptoBooks})
 
     for (var i = 0; i < 100; i++) db.put('hello-' + i, 'world-' + i)
     db.put('flush', 'flush', function () {

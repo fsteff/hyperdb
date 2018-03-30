@@ -1,10 +1,12 @@
 # hyperdb
 
-Distributed scalable database.
+Distributed scalable database
 
 ```
 npm install hyperdb
 ```
+
+This version uses [hypercore-encrypted](https://github.com/fsteff/hypercore-encrypted)
 
 Read [ARCHITECTURE.md](ARCHITECTURE.md) for details on how hyperdb works.
 

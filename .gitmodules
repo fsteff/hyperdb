@@ -1,0 +1,3 @@
+[submodule "hypercore-encrypted"]
+	path = hypercore-encrypted
+	url = https://github.com/fsteff/hypercore-encrypted

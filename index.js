@@ -1,4 +1,5 @@
-var hypercore = require('hypercore')
+var hypercore = require('./hypercore-encrypted/index')
+var CryptoBook = require('./hypercore-encrypted/libs/CryptoBook')
 var protocol = require('hypercore-protocol')
 var thunky = require('thunky')
 var remove = require('unordered-array-remove')
@@ -33,6 +34,8 @@ function HyperDB (storage, key, opts) {
     opts = key
     key = null
   }
+
+  const self = this
 
   if (!opts) opts = {}
   if (opts.firstNode) opts.reduce = reduceFirst
@@ -71,6 +74,23 @@ function HyperDB (storage, key, opts) {
   this._batchingNodes = null
   this._secretKey = opts.secretKey || null
   this._storeSecretKey = opts.storeSecretKey !== false
+
+  this.cryptoBooks = null
+  if (opts.cryptoBooks) {
+    this.cryptoBooks = {}
+    Object.keys(opts.cryptoBooks).forEach((key) => {
+      var val = opts.cryptoBooks[key]
+      if (key.length !== 64) { throw new Error('cryptoBook entry keys have to be hex codes hypercore ids') }
+      if (!(val instanceof CryptoBook)) {
+        try {
+          val = new CryptoBook(val)
+        } catch (err) {
+          throw new Error('cryptoBook entry values have to be an instance of CryptoBook or a serialized CryptoBook')
+        }
+      }
+      self.cryptoBooks[key] = val
+    })
+  }
 
   this.ready()
 }
@@ -439,7 +459,30 @@ HyperDB.prototype._writer = function (dir, key, opts) {
     sparse: this.sparse
   })
 
+  var store = null
+  if (this.cryptoBooks) {
+    var book = null
+    if (key && (key === this.key &&
+        this.cryptoBooks[key.toString('hex')])) {
+      // if key === this.key a new one may be generated
+      book = this.cryptoBooks[key.toString('hex')]
+      if (!book) {
+        console.warn('no encryption key provided for feed ' + key.toString('hex'))
+      }
+    } else {
+      // if key is not specified this means a new feed is started -> also new CryptoBook
+      book = new CryptoBook()
+      book.generateNewKey(0)
+      store = book
+    }
+    opts.encryptionKeyBook = book
+  }
   var feed = hypercore(storage, key, opts)
+  if (store) {
+    feed.on('ready', () => {
+      self.cryptoBooks[feed.key.toString('hex')] = feed.cryptoKeyBook
+    })
+  }
 
   writer = new Writer(self, feed)
   feed.on('append', onappend)
@@ -828,12 +871,19 @@ Writer.prototype._ensureContentFeed = function (key) {
     secretKey = pair.secretKey
     key = pair.publicKey
   }
-
-  this._contentFeed = hypercore(storage, key, {
+  var opts = {
     sparse: this._db.sparseContent,
     storeSecretKey: false,
     secretKey
-  })
+  }
+  if (this.cryptoBooks) {
+    var book = this.cryptoBooks[key.toString('hex')]
+    if (!book) {
+      console.warn('no encryption key provided for feed ' + key.toString('hex'))
+    }
+    opts.encryptionKeyBook = book
+  }
+  this._contentFeed = hypercore(storage, key, opts)
 
   if (this._db.contentFeeds) this._db.contentFeeds[this._id] = this._contentFeed
 

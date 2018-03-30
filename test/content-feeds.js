@@ -26,7 +26,7 @@ tape('basic content feed', function (t) {
 tape('replicating content feeds', function (t) {
   var db = create.one(null, {contentFeed: true})
   db.put('hello', 'world', function () {
-    var clone = create.one(db.key, {contentFeed: true})
+    var clone = create.one(db.key, {contentFeed: true, cryptoBooks: db.cryptoBooks})
     db.localContent.append('data', function () {
       replicate(db, clone, function () {
         clone.get('hello', function (err, node) {
