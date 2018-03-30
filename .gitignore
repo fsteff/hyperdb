@@ -5,3 +5,4 @@ db
 *.log
 NOTES.txt
 .vscode
+package-lock.json
