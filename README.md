@@ -10,7 +10,7 @@ Read [ARCHITECTURE.md](ARCHITECTURE.md) for details on how hyperdb works.
 
 ## About this fork
 
-This version uses [hypercore-encrypted](https://github.com/fsteff/hypercore-encrypted)
+This version uses [hypercore-encrypted](https://github.com/fsteff/hypercore-encrypted)<br>
 **Warning: this is experimental and should be reviewed by a crypto expert before production use!**
 
 ## Usage
