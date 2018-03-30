@@ -6,9 +6,12 @@ Distributed scalable database
 npm install hyperdb
 ```
 
-This version uses [hypercore-encrypted](https://github.com/fsteff/hypercore-encrypted)
-
 Read [ARCHITECTURE.md](ARCHITECTURE.md) for details on how hyperdb works.
+
+## About this fork
+
+This version uses [hypercore-encrypted](https://github.com/fsteff/hypercore-encrypted)
+**Warning: this is experimental and should be reviewed by a crypto expert before production use!**
 
 ## Usage
 
@@ -64,7 +67,8 @@ Options include:
   map: node => mappedNode, // map nodes before returning them
   reduce: (a, b) => someNode, // reduce the nodes array before returning it
   firstNode: false, // set to true to reduce the nodes array to the first node in it
-  valueEncoding: 'binary' // set the value encoding of the db
+  valueEncoding: 'binary', // set the value encoding of the db
+  cryptoBooks: {} // key-value-pairs of feed keys and instances of hypercore-encrypted/libs/CryptoBook
 }
 ```
 
