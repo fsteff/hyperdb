@@ -3,14 +3,15 @@
 Distributed scalable database (fork that supports encrypting the data, [this](https://github.com/mafintosh/hyperdb) is the original)
 
 ```
-npm install hyperdb
+npm install hyperdb-encrypted
 ```
 
 Read [ARCHITECTURE.md](ARCHITECTURE.md) for details on how hyperdb works.
 
 ## About this fork
 
-This version uses [hypercore-encrypted](https://github.com/fsteff/hypercore-encrypted)<br>
+This version uses [hypercore-encrypted](https://github.com/fsteff/hypercore-encrypted) instead of 
+[hypercore](https://github.com/mafintosh/hypercore)<br>
 **Warning: this is experimental and should be reviewed by a crypto expert before production use!**
 
 ## Usage
