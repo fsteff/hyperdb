@@ -1,4 +1,5 @@
 var tape = require('tape')
+var cmp = require('compare')
 var create = require('./helpers/create')
 var put = require('./helpers/put')
 var run = require('./helpers/run')
@@ -7,7 +8,11 @@ var hash = require('../lib/hash')
 function sortByHash (a, b) {
   var ha = hash(typeof a === 'string' ? a : a.key).join('')
   var hb = hash(typeof b === 'string' ? b : b.key).join('')
-  return ha.localeCompare(hb)
+  return cmp(ha, hb)
+}
+
+function reverseSortByHash (a, b) {
+  return -1 * sortByHash(a, b)
 }
 
 const cases = {
@@ -22,6 +27,8 @@ Object.keys(cases).forEach((key) => {
     run(
       cb => testSingleFeedWithKeys(t, keysToTest, cb),
       cb => testTwoFeedsWithKeys(t, keysToTest, cb),
+      cb => testSingleFeedWithKeys(t, keysToTest, { reverse: true, sort: reverseSortByHash }, cb),
+      cb => testTwoFeedsWithKeys(t, keysToTest, { reverse: true, sort: reverseSortByHash }, cb),
       cb => t.end()
     )
   })
@@ -61,16 +68,26 @@ tape('fully visit a folder before visiting the next one', function (t) {
   })
 })
 
-function testSingleFeedWithKeys (t, keys, cb) {
+function testSingleFeedWithKeys (t, keys, opts, cb) {
+  if (typeof opts === 'function') return testSingleFeedWithKeys(t, keys, null, opts)
+  opts = opts || {}
+
+  var sortFunc = opts.sort || sortByHash
+
   t.comment('with single feed')
   var db = create.one()
   put(db, keys, function (err) {
     t.error(err, 'no error')
-    testIteratorOrder(t, db.iterator(), keys, cb)
+    testIteratorOrder(t, db.iterator(opts), keys, sortFunc, cb)
   })
 }
 
-function testTwoFeedsWithKeys (t, keys, cb) {
+function testTwoFeedsWithKeys (t, keys, opts, cb) {
+  if (typeof opts === 'function') return testTwoFeedsWithKeys(t, keys, null, opts)
+  opts = opts || {}
+
+  var sortFunc = opts.sort || sortByHash
+
   t.comment('with values split across two feeds')
   create.two(function (db1, db2, replicate) {
     var half = Math.floor(keys.length / 2)
@@ -78,8 +95,8 @@ function testTwoFeedsWithKeys (t, keys, cb) {
       cb => put(db1, keys.slice(0, half), cb),
       cb => put(db2, keys.slice(half), cb),
       cb => replicate(cb),
-      cb => testIteratorOrder(t, db1.iterator(), keys, cb),
-      cb => testIteratorOrder(t, db2.iterator(), keys, cb),
+      cb => testIteratorOrder(t, db1.iterator(opts), keys, sortFunc, cb),
+      cb => testIteratorOrder(t, db2.iterator(opts), keys, sortFunc, cb),
       done
     )
   })
@@ -89,8 +106,8 @@ function testTwoFeedsWithKeys (t, keys, cb) {
   }
 }
 
-function testIteratorOrder (t, iterator, expected, done) {
-  var sorted = expected.slice(0).sort(sortByHash)
+function testIteratorOrder (t, iterator, expected, sortFunc, done) {
+  var sorted = expected.slice(0).sort(sortFunc)
   each(iterator, onEach, onDone)
   function onEach (err, node) {
     t.error(err, 'no error')

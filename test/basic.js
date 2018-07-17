@@ -302,6 +302,34 @@ tape('basic batch', function (t) {
   })
 })
 
+tape('batch with del', function (t) {
+  t.plan(1 + 1 + 3 + 2)
+
+  var db = create.one()
+
+  db.batch([
+    {key: 'hello', value: 'world'},
+    {key: 'hej', value: 'verden'},
+    {key: 'hello', value: 'welt'}
+  ], function (err) {
+    t.error(err, 'no error')
+    db.batch([
+      {key: 'hello', value: 'verden'},
+      {type: 'del', key: 'hej'}
+    ], function (err) {
+      t.error(err, 'no error')
+      db.get('hello', function (err, node) {
+        t.error(err, 'no error')
+        t.same(node.key, 'hello')
+        t.same(node.value, 'verden')
+      })
+      db.get('hej', function (err, node) {
+        t.error(err, 'no error')
+        t.same(node, null)
+      })
+    })
+  })
+})
 tape('multiple batches', function (t) {
   t.plan(19)
 
@@ -437,6 +465,53 @@ tape('create with precreated keypair', function (t) {
       t.error(err, 'no error')
       t.same(node.value, 'world', 'same value')
       t.end()
+    })
+  })
+})
+
+tape('can insert falsy values', function (t) {
+  t.plan(2 * 2 + 3 + 1)
+
+  var db = create.one(null, {valueEncoding: 'json'})
+
+  db.put('hello', 0, function () {
+    db.put('world', false, function () {
+      db.get('hello', function (err, node) {
+        t.error(err, 'no error')
+        t.same(node && node.value, 0)
+      })
+      db.get('world', function (err, node) {
+        t.error(err, 'no error')
+        t.same(node && node.value, false)
+      })
+
+      var ite = db.iterator()
+      var result = {}
+
+      ite.next(function loop (err, node) {
+        t.error(err, 'no error')
+
+        if (!node) {
+          t.same(result, {hello: 0, world: false})
+          return
+        }
+
+        result[node.key] = node.value
+        ite.next(loop)
+      })
+    })
+  })
+})
+
+tape('can put/get a null value', function (t) {
+  t.plan(3)
+
+  var db = create.one(null, {valueEncoding: 'json'})
+  db.put('some key', null, function (err) {
+    t.error(err, 'no error')
+    db.get('some key', function (err, node) {
+      t.error(err, 'no error')
+      t.same(node.value, null)
     })
   })
 })

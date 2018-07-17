@@ -1,4 +1,5 @@
 var tape = require('tape')
+var cmp = require('compare')
 var create = require('./helpers/create')
 var run = require('./helpers/run')
 var replicate = require('./helpers/replicate')
@@ -75,12 +76,12 @@ tape('two writers, one conflict', function (t) {
 
       function onb (err, nodes) {
         t.error(err, 'no error')
-        nodes.sort((a, b) => a.value.localeCompare(b.value))
+        nodes.sort((a, b) => cmp(a.value, b.value))
         t.same(nodes.length, 2)
         t.same(nodes[0].key, 'b')
-        t.same(nodes[0].value, 'b')
+        t.same(nodes[0].value, 'B')
         t.same(nodes[1].key, 'b')
-        t.same(nodes[1].value, 'B')
+        t.same(nodes[1].value, 'b')
       }
 
       function ona (err, nodes) {
@@ -185,7 +186,7 @@ tape('two writers, simple fork', function (t) {
     function on1 (err, nodes) {
       t.error(err, 'no error')
       t.same(nodes.length, 2)
-      nodes.sort((a, b) => a.value.localeCompare(b.value))
+      nodes.sort((a, b) => cmp(a.value, b.value))
       t.same(nodes[0].key, '1')
       t.same(nodes[0].value, '1a')
       t.same(nodes[1].key, '1')
@@ -235,6 +236,64 @@ tape('three writers, no conflicts, forks', function (t) {
       t.same(nodes.length, 1)
       t.same(nodes[0].key, 'a')
       t.same(nodes[0].value, 'aa')
+    }
+  })
+})
+
+tape('replication to two new peers, only authorize one writer', function (t) {
+  var a = create.one()
+  a.ready(function () {
+    var b = create.one(a.key)
+    var c = create.one(a.key)
+
+    run(
+      cb => b.ready(cb),
+      cb => c.ready(cb),
+      cb => a.put('foo', 'bar', cb),
+      cb => a.authorize(b.local.key, cb),
+      cb => replicate(a, b, cb),
+      cb => replicate(a, c, cb),
+      done
+    )
+
+    function done (err) {
+      t.error(err, 'no error')
+      c.authorized(c.local.key, function (err, auth) {
+        t.error(err, 'no error')
+        t.notOk(auth)
+        t.end()
+      })
+    }
+  })
+})
+
+tape('2 unauthed clones', function (t) {
+  t.plan(1 + 2 * 2)
+
+  var db = create.one(null)
+
+  db.ready(function () {
+    var clone1 = create.one(db.key)
+    var clone2 = create.one(db.key)
+
+    run(
+      cb => db.put('hello', 'world', cb),
+      cb => clone1.ready(cb),
+      cb => replicate(db, clone1, cb),
+      cb => clone2.ready(cb),
+      cb => replicate(clone1, clone2, cb),
+      done
+    )
+
+    function done (err) {
+      t.error(err, 'no error')
+      clone1.get('hello', onhello)
+      clone2.get('hello', onhello)
+
+      function onhello (err, node) {
+        t.error(err, 'no error')
+        t.same(node.value, 'world')
+      }
     }
   })
 })

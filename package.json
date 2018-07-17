@@ -1,6 +1,6 @@
 {
   "name": "hyperdb",
-  "version": "3.0.0-1",
+  "version": "3.3.0",
   "description": "Distributed scalable database",
   "main": "index.js",
   "dependencies": {
@@ -8,10 +8,13 @@
     "bulk-write-stream": "^1.1.3",
     "codecs": "^1.2.1",
     "hypercore-encrypted": "0.0.1",
+    "array-lru": "^1.1.1",
+    "compare": "^2.0.0",
+    "hypercore": "^6.13.0",
     "hypercore-protocol": "^6.6.4",
     "inherits": "^2.0.3",
     "mutexify": "^1.2.0",
-    "nanoiterator": "^1.0.0",
+    "nanoiterator": "^1.1.0",
     "protocol-buffers-encodings": "^1.1.0",
     "random-access-file": "^2.0.1",
     "randombytes": "^2.0.6",
@@ -22,8 +25,11 @@
     "varint": "^5.0.0"
   },
   "devDependencies": {
+    "prettier": "^1.12.0",
     "protocol-buffers": "^4.0.4",
-    "random-access-memory": "^2.4.0",
+    "random-access-latency": "^1.0.0",
+    "random-access-memory": "^3.0.0",
+    "seed-random": "^2.2.0",
     "standard": "^11.0.0",
     "stream-collector": "^1.0.1",
     "tape": "^4.9.0"
@@ -44,8 +50,7 @@
   "homepage": "https://github.com/mafintosh/hyperdb#readme",
   "standard": {
     "ignore": [
-      "/node_modules/",
-      "/hypercore-encrypted/"
+      "test/helpers/fuzzing.js"
     ]
   }
 }
