@@ -1,6 +1,7 @@
 # hyperdb-encrypted
 
 Distributed scalable database (fork that supports encrypting the data)
+[this](https://github.com/mafintosh/hyperdb) is the original
 
 ```
 npm install hyperdb
