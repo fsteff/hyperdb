@@ -1,6 +1,6 @@
-# hyperdb
+# hyperdb-encrypted
 
-Distributed scalable database
+Distributed scalable database (fork that supports encrypting the data)
 
 ```
 npm install hyperdb
