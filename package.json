@@ -1,7 +1,7 @@
 {
-  "name": "hyperdb",
+  "name": "hyperdb-encrypted",
   "version": "3.3.0",
-  "description": "Distributed scalable database",
+  "description": "Distributed scalable database (fork that supports encrypting the data)",
   "main": "index.js",
   "dependencies": {
     "aes-js": "^3.1.0",
@@ -40,14 +40,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mafintosh/hyperdb.git"
+    "url": "https://github.com/fsteff/hyperdb-encrypted.git"
   },
-  "author": "Mathias Buus (@mafintosh)",
+  "author": "Stefan Fixl (Fsteff)",
+  "contributors": [
+    "Mathias Buus (@mafintosh)"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mafintosh/hyperdb/issues"
+    "url": "https://github.com/fsteff/hyperdb-encrypted/issues"
   },
-  "homepage": "https://github.com/mafintosh/hyperdb#readme",
+  "homepage": "https://github.com/fsteff/hyperdb-encrypted#readme",
   "standard": {
     "ignore": [
       "test/helpers/fuzzing.js"
