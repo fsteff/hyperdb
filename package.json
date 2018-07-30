@@ -1,13 +1,13 @@
 {
   "name": "hyperdb-encrypted",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Distributed scalable database (fork that supports encrypting the data)",
   "main": "index.js",
   "dependencies": {
     "aes-js": "^3.1.0",
     "bulk-write-stream": "^1.1.3",
     "codecs": "^1.2.1",
-    "hypercore-encrypted": "0.0.1",
+    "hypercore-encrypted": "^0.0.3",
     "array-lru": "^1.1.1",
     "compare": "^2.0.0",
     "hypercore": "^6.13.0",
